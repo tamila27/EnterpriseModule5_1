@@ -9,9 +9,14 @@ import java.util.StringTokenizer;
  * Created by tamila on 5/14/16.
  */
 public class MathExpressionParser {
+    private Calculator calculator;
 
-    public static List<String> parseExpression(String expression){
-        StringTokenizer stringTokenizer = new StringTokenizer(expression, OperatorsFactory.getOperatorsTokens(), true);
+    public void setCalculator(Calculator calculator){
+        this.calculator = calculator;
+    }
+
+    public List<String> parseExpression(String expression){
+        StringTokenizer stringTokenizer = new StringTokenizer(expression, calculator.getOperatorsTokens(), true);
         List<String> parsedExpression = new ArrayList<>();
         while(stringTokenizer.hasMoreTokens()){
             String token = stringTokenizer.nextToken().trim();
@@ -22,19 +27,19 @@ public class MathExpressionParser {
         return parsedExpression;
     }
 
-    private static boolean isOperator(String operator) {
-        return OperatorsFactory.getOperatorsTokens().contains(operator);
+    private boolean isOperator(String operator) {
+        return calculator.getOperatorBySign(operator) != null;
     }
 
-    private static int getOperatorPriority(Operator operator) {
+    private int getOperatorPriority(Operator operator) {
         return operator.getPriority();
     }
 
-    private static Operator getOperatorObject(String operator){
-        return OperatorsFactory.getOperatorObject(operator);
+    private Operator getOperatorObject(String operator){
+        return calculator.getOperatorBySign(operator);
     }
 
-    private static void calculateSimpleExpression(LinkedList<String> numbers, Operator operator) throws NullPointerException, IllegalArgumentException {
+    private void calculateSimpleExpression(LinkedList<String> numbers, Operator operator) throws NullPointerException, IllegalArgumentException {
         if(numbers == null || operator == null) {
             throw new NullPointerException();
         }
@@ -43,13 +48,13 @@ public class MathExpressionParser {
         String someTwo = ( numbers.size() > 0) ? numbers.removeLast() : "0";
 
         if (operator instanceof BinaryOperator){
-            numbers.add(((BinaryOperator) operator).calculate(someOne, someTwo));
+            numbers.add(((BinaryOperator) operator).calculate(someTwo, someOne));
         } else if (operator instanceof UnaryOperator){
             numbers.add(((UnaryOperator) operator).calculate(someOne));
         }
     }
 
-    public static String calculateExpression(String s) throws NumberFormatException, IllegalArgumentException, NullPointerException{
+    public String calculateExpression(String s) throws NumberFormatException, IllegalArgumentException, NullPointerException{
 
         if(s == null || s.equals(""))
             return "0";
@@ -84,9 +89,4 @@ public class MathExpressionParser {
 
         return numbers.get(0);
     }
-
-    public static void main(String[] args) {
-        System.out.println(calculateExpression("1-1"));
-    }
-
 }

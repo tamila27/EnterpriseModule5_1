@@ -14,7 +14,7 @@ public abstract class Operator {
         this.priority = priority;
     }
 
-    public static boolean isValid(){
+    public boolean isValid(){
         return true;
     }
 }
